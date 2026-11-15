@@ -6,8 +6,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && useradd -r -g harness -u 1000 -m -d /home/harness harness \
     && mkdir -p /work /data /log \
     && chown -R harness:harness /work /data /log /home/harness
-COPY --chown=harness:harness target/harness2-0.1.0-runner /work/application
-RUN chmod 755 /work/application
+COPY --chown=harness:harness target/harness2-0.1.0-runner /opt/harness2/application
+RUN chmod 755 /opt/harness2/application \
+    && mkdir -p /workspace && chown harness:harness /workspace
 USER harness
+WORKDIR /workspace
 EXPOSE 18004
-ENTRYPOINT ["/work/application"]
+ENV LOG_DIR=/data/log
+ENTRYPOINT ["/opt/harness2/application"]
