@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-mkdir -p "${LOG_DIR:-./logs}"
+mkdir -p "${LOG_DIR:-./logs}" ./workspace
+chown 1000:1000 ./workspace 2>/dev/null || true
 if [ ! -f target/harness-0.1.0.jar ]; then
     echo "==> Building jar..."
     mvn package -DskipTests
