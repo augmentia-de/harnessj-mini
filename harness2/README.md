@@ -31,3 +31,6 @@ java -jar target/quarkus-app/quarkus-run.jar
 
 ## Konfiguration
 Siehe `.env.example`. Werte werden über `application.properties` gemappt (`llm.*`).
+
+## Hinweis
+LangChain4j macht den Code kürzer und native-build-sicherer, kostet aber eine Dependency.
