@@ -33,8 +33,8 @@ public class HarnessController {
 
     private final ExecutorService executor = Executors.newCachedThreadPool();
 
-    @PostMapping(value = "/run", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter run(@RequestBody String task) {
+    @GetMapping(value = "/run", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter run(@RequestParam String task) {
         SseEmitter emitter = new SseEmitter(300_000L);
         executor.submit(() -> {
             try {

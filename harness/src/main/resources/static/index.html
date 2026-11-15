@@ -23,7 +23,7 @@ function run() {
     const es = new EventSource('/api/run?task=' + encodeURIComponent(task));
     // EventSource only GET; use fetch with SSE manually
     es.close();
-    fetch('/api/run', { method: 'POST', body: task, headers: { 'Content-Type': 'text/plain' } })
+    fetch('/api/run?task=' + encodeURIComponent(task))
         .then(r => {
             const reader = r.body.getReader();
             const decoder = new TextDecoder();
