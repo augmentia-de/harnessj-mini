@@ -1,0 +1,28 @@
+services:
+  harness2-native:
+    image: harness2:native
+    container_name: harness2-native
+    working_dir: /work
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - QUARKUS_HTTP_PORT=18004
+      - LOG_DIR=/data/log
+      - HOME=/data/home
+    volumes:
+      - ./log:/data/log
+      - ./data/home:/data/home
+    ports:
+      - "127.0.0.1:18004:18004"
+    user: "${UID:-1000}:${GID:-1000}"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    privileged: false
+    userns_mode: ""

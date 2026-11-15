@@ -1,0 +1,13 @@
+FROM debian:bookworm-slim
+WORKDIR /work/
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r harness -g 1000 \
+    && useradd -r -g harness -u 1000 -m -d /home/harness harness \
+    && mkdir -p /work /data /log \
+    && chown -R harness:harness /work /data /log /home/harness
+COPY --chown=harness:harness target/harness2-0.1.0-runner /work/application
+RUN chmod 755 /work/application
+USER harness
+EXPOSE 18004
+ENTRYPOINT ["/work/application"]
