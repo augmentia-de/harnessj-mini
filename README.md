@@ -7,8 +7,6 @@ Minimal agent harness in Java — two implementations:
 - **`harness/`** — Spring Boot (Java 21), Lanterna TUI + Web UI (SSE), port 18000.
 - **`harness2/`** — Quarkus + LangChain4j, native build, Web UI, port 18004.
 
-Both implement the 18 design recommendations from the Harness Engineering paper (Section 16) as a 90-line MVP scaffold.
-
 ## Build
 
 ```bash

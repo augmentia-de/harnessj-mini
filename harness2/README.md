@@ -1,6 +1,6 @@
 # Harness2 — Quarkus + LangChain4j (Native)
 
-Funktional identisch zu `harness`, aber auf Quarkus + LangChain4j Basis mit Native-Build.
+Functionally identical to `harness`, but based on Quarkus + LangChain4j with native build.
 
 ## Build
 
@@ -29,8 +29,8 @@ java -jar target/quarkus-app/quarkus-run.jar
 ./deploy-native.sh
 ```
 
-## Konfiguration
-Siehe `.env.example`. Werte werden über `application.properties` gemappt (`llm.*`).
+## Configuration
+See `.env.example`. Values are mapped via `application.properties` (`llm.*`).
 
-## Hinweis
-LangChain4j macht den Code kürzer und native-build-sicherer, kostet aber eine Dependency.
+## Note
+LangChain4j makes the code shorter and native-build-safe, but adds a dependency.

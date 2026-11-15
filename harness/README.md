@@ -1,6 +1,6 @@
 # Harness — 90-Zeilen-MVP-Scaffold
 
-Eigenständiges Java-Modul. Implementiert 10 von 18 Design-Empfehlungen.
+Standalone Java module. Implements 10 of 18 design recommendations.
 
 ## Module
 
@@ -26,4 +26,4 @@ java -jar target/harness-0.1.0.jar "your task here"
 
 ## Konfiguration
 
-Siehe `.env.example`. Werte werden über `application.properties` gemappt.
+See `.env.example`. Values are mapped via `application.properties`.
