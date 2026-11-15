@@ -35,12 +35,13 @@ public class HarnessController {
 
     @GetMapping(value = "/run", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter run(@RequestParam String task) {
-        SseEmitter emitter = new SseEmitter(300_000L);
+        SseEmitter emitter = new SseEmitter(0L);
         executor.submit(() -> {
             try {
-                // Run in a capturing manner: we can't easily stream turns, so send final result.
                 emitter.send(SseEmitter.event().name("start").data("Task: " + task));
-                String result = getHarness().chat(task);
+                String result = getHarness().chat(task, turn -> {
+                    try { emitter.send(SseEmitter.event().name("turn").data(turn)); } catch (IOException ignored) {}
+                });
                 emitter.send(SseEmitter.event().name("result").data(result));
                 emitter.complete();
             } catch (Exception e) {

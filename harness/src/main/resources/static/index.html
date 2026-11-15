@@ -23,19 +23,11 @@ function run() {
     const es = new EventSource('/api/run?task=' + encodeURIComponent(task));
     // EventSource only GET; use fetch with SSE manually
     es.close();
-    fetch('/api/run?task=' + encodeURIComponent(task))
-        .then(r => {
-            const reader = r.body.getReader();
-            const decoder = new TextDecoder();
-            function read() {
-                reader.read().then(({done, value}) => {
-                    if (done) return;
-                    out.textContent += decoder.decode(value);
-                    read();
-                });
-            }
-            read();
-        });
+    const es = new EventSource('/api/run?task=' + encodeURIComponent(task));
+    es.addEventListener('start', e => { out.textContent += e.data + '\\n'; });
+    es.addEventListener('turn', e => { out.textContent += e.data + '\\n'; });
+    es.addEventListener('result', e => { out.textContent += '\\n=== RESULT ===\\n' + e.data; es.close(); });
+    es.addEventListener('error', e => { out.textContent += '\\nERROR: ' + e.data; es.close(); });
 }
 </script>
 </body>

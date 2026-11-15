@@ -83,10 +83,18 @@ public class MinimalHarness {
      * append user message and continue the loop.
      */
     public String chat(String userMessage) {
-        return chat(userMessage, Path.of("."));
+        return chat(userMessage, Path.of("."), null);
     }
 
     public String chat(String userMessage, Path cwd) {
+        return chat(userMessage, cwd, null);
+    }
+
+    public String chat(String userMessage, java.util.function.Consumer<String> onTurn) {
+        return chat(userMessage, Path.of("."), onTurn);
+    }
+
+    public String chat(String userMessage, Path cwd, java.util.function.Consumer<String> onTurn) {
         if (messages.isEmpty()) {
             messages.add(Map.of("role", "system", "content",
                     "You are a SWE agent.\n\n" + ContextDiscovery.discover(cwd)));
@@ -124,6 +132,14 @@ public class MinimalHarness {
                         "content", Tools.truncate(out)));
             }
             if (consecutiveMalformed >= 5) throw new IllegalStateException("too many malformed responses");
+            if (onTurn != null) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Turn ").append(nTurns).append(": ").append(resp.content());
+                if (!resp.toolCalls().isEmpty()) {
+                    sb.append(" [").append(resp.toolCalls().size()).append(" tool calls]");
+                }
+                onTurn.accept(sb.toString());
+            }
         }
     }
 
