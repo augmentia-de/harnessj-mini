@@ -15,18 +15,24 @@ public class MinimalHarness {
     private final long wallClockMaxMs;
     private final long startedAt;
     private final PermissionGate permissionGate;
+    private final int maxRetries;
+    private final long retryBackoffMs;
     private final List<String> recentCallSignatures = new ArrayList<>();
     private int consecutiveMalformed = 0;
 
     public MinimalHarness(Model model, int maxTurns, double maxCost, int compactAtTokens) {
-        this(model, maxTurns, maxCost, compactAtTokens, null, 0);
+        this(model, maxTurns, maxCost, compactAtTokens, null, 0, 3, 1000);
     }
 
     public MinimalHarness(Model model, int maxTurns, double maxCost, int compactAtTokens, PermissionGate permissionGate) {
-        this(model, maxTurns, maxCost, compactAtTokens, permissionGate, 0);
+        this(model, maxTurns, maxCost, compactAtTokens, permissionGate, 0, 3, 1000);
     }
 
     public MinimalHarness(Model model, int maxTurns, double maxCost, int compactAtTokens, PermissionGate permissionGate, long wallClockMaxMs) {
+        this(model, maxTurns, maxCost, compactAtTokens, permissionGate, wallClockMaxMs, 3, 1000);
+    }
+
+    public MinimalHarness(Model model, int maxTurns, double maxCost, int compactAtTokens, PermissionGate permissionGate, long wallClockMaxMs, int maxRetries, long retryBackoffMs) {
         this.model = model;
         this.maxTurns = maxTurns;
         this.maxCost = maxCost;
@@ -34,6 +40,8 @@ public class MinimalHarness {
         this.permissionGate = permissionGate;
         this.wallClockMaxMs = wallClockMaxMs;
         this.startedAt = System.currentTimeMillis();
+        this.maxRetries = maxRetries;
+        this.retryBackoffMs = retryBackoffMs;
     }
 
     private int tokenEstimate() {
@@ -73,6 +81,37 @@ public class MinimalHarness {
         return false;
     }
 
+    private Model.Response completeWithRetry(List<Map<String, Object>> messages, List<Map<String, Object>> tools) {
+        int attempts = 0;
+        while (true) {
+            try {
+                return model.complete(messages, tools);
+            } catch (NonRetryableException e) {
+                log.warn("Non-retryable LLM error: {}", e.getMessage());
+                throw e;
+            } catch (RetryableException e) {
+                attempts++;
+                if (attempts >= maxRetries) {
+                    log.warn("LLM retry exhausted after {} attempts: {}", attempts, e.getMessage());
+                    throw e;
+                }
+                long backoff = retryBackoffMs * (1L << (attempts - 1));
+                log.info("LLM retryable error (attempt {}/{}), backing off {}ms: {}", attempts, maxRetries, backoff, e.getMessage());
+                try { Thread.sleep(backoff); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); throw new RuntimeException(ie); }
+            } catch (Exception e) {
+                // Treat unknown exceptions as retryable
+                attempts++;
+                if (attempts >= maxRetries) {
+                    log.warn("LLM unknown error, retry exhausted: {}", e.getMessage());
+                    throw new RetryableException("LLM error: " + e.getMessage(), e);
+                }
+                long backoff = retryBackoffMs * (1L << (attempts - 1));
+                log.info("LLM unknown error (attempt {}/{}), backing off {}ms: {}", attempts, maxRetries, backoff, e.getMessage());
+                try { Thread.sleep(backoff); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); throw new RuntimeException(ie); }
+            }
+        }
+    }
+
     public String run(String task) {
         return run(task, Path.of("."));
     }
@@ -104,7 +143,7 @@ public class MinimalHarness {
         while (true) {
             checkLimits();
             maybeCompact();
-            Model.Response resp = model.complete(messages, Tools.schemas());
+            Model.Response resp = completeWithRetry(messages, Tools.schemas());
             nTurns++;
             cost += resp.cost();
             messages.add(Map.of("role", "assistant", "content", resp.content(),
@@ -161,7 +200,7 @@ public class MinimalHarness {
         while (true) {
             checkLimits();
             maybeCompact();
-            Model.Response resp = model.complete(messages, Tools.schemas());
+            Model.Response resp = completeWithRetry(messages, Tools.schemas());
             nTurns++;
             cost += resp.cost();
             messages.add(Map.of("role", "assistant", "content", resp.content(),

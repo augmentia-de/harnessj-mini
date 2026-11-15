@@ -28,7 +28,7 @@ public class HarnessApplication {
             }
             String task = args.length > 0 ? String.join(" ", args) : "Say hello and list the current directory.";
             OpenAiModel model = new OpenAiModel(props.baseUrl(), props.apiKey(), props.model(), props.sessionId());
-            MinimalHarness harness = new MinimalHarness(model, props.maxTurns(), props.maxCost(), props.compactAtTokens(), PermissionGate.allowAll());
+            MinimalHarness harness = new MinimalHarness(model, props.maxTurns(), props.maxCost(), props.compactAtTokens(), PermissionGate.allowAll(), 0, props.maxRetries(), props.retryBackoffMs());
             String result = harness.run(task);
             System.out.println("=== RESULT ===");
             System.out.println(result);

@@ -10,7 +10,9 @@ public record HarnessProperties(
         String sessionId,
         int maxTurns,
         double maxCost,
-        int compactAtTokens
+        int compactAtTokens,
+        int maxRetries,
+        long retryBackoffMs
 ) {
     public HarnessProperties {
         if (baseUrl == null || baseUrl.isBlank()) baseUrl = "https://api.openai.com/v1";
@@ -19,5 +21,7 @@ public record HarnessProperties(
         if (maxCost <= 0) maxCost = 5.0;
         if (compactAtTokens <= 0) compactAtTokens = 100000;
         if (sessionId == null) sessionId = "";
+        if (maxRetries <= 0) maxRetries = 3;
+        if (retryBackoffMs <= 0) retryBackoffMs = 1000;
     }
 }

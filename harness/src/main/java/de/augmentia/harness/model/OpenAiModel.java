@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.augmentia.harness.Model;
+import de.augmentia.harness.RetryableException;
+import de.augmentia.harness.NonRetryableException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -78,8 +80,15 @@ public class OpenAiModel implements Model {
             if (apiKey != null && !apiKey.isBlank()) rb.header("Authorization", "Bearer " + apiKey);
             if (!sessionId.isBlank()) rb.header("x-opencode-session", sessionId);
             HttpResponse<String> resp = http.send(rb.build(), HttpResponse.BodyHandlers.ofString());
-            if (resp.statusCode() >= 400) {
-                return new Response("HTTP " + resp.statusCode() + ": " + resp.body(), List.of(), 0, 0.0);
+            int status = resp.statusCode();
+            if (status == 400 || status == 401 || status == 403 || status == 404) {
+                throw new NonRetryableException("HTTP " + status + ": " + resp.body());
+            }
+            if (status == 429 || status >= 500) {
+                throw new RetryableException("HTTP " + status + ": " + resp.body());
+            }
+            if (status >= 400) {
+                throw new NonRetryableException("HTTP " + status + ": " + resp.body());
             }
             JsonNode root = MAPPER.readTree(resp.body());
             JsonNode choice = root.path("choices").path(0).path("message");
@@ -99,8 +108,12 @@ public class OpenAiModel implements Model {
             }
             int tokens = root.path("usage").path("total_tokens").asInt(0);
             return new Response(content, calls, tokens, 0.0);
+        } catch (NonRetryableException | RetryableException e) {
+            throw e;
+        } catch (java.io.IOException | InterruptedException e) {
+            throw new RetryableException("IO error: " + e.getMessage(), e);
         } catch (Exception e) {
-            return new Response("ERROR: " + e.getMessage(), List.of(), 0, 0.0);
+            throw new RetryableException("Unexpected error: " + e.getMessage(), e);
         }
     }
 }

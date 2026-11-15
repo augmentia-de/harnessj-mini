@@ -22,7 +22,7 @@ public class HarnessTui {
     private MinimalHarness getHarness() {
         if (harness == null) {
             OpenAiModel model = new OpenAiModel(props.baseUrl(), props.apiKey(), props.model(), props.sessionId());
-            harness = new MinimalHarness(model, props.maxTurns(), props.maxCost(), props.compactAtTokens());
+            harness = new MinimalHarness(model, props.maxTurns(), props.maxCost(), props.compactAtTokens(), null, 0, props.maxRetries(), props.retryBackoffMs());
         }
         return harness;
     }

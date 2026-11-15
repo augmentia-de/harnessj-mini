@@ -60,9 +60,33 @@ public class Lc4jHarness {
         }
         messages.add(UserMessage.from(userMessage));
 
+        int maxRetries = 3;
+        long backoffMs = 1000;
         while (true) {
             ChatRequest request = ChatRequest.builder().messages(messages).toolSpecifications(toolSpecs).build();
-            ChatResponse response = model.chat(request);
+            ChatResponse response;
+            int attempt = 0;
+            while (true) {
+                try {
+                    response = model.chat(request);
+                    break;
+                } catch (Exception e) {
+                    String msg = e.getMessage() == null ? "" : e.getMessage();
+                    boolean nonRetryable = msg.contains("400") || msg.contains("401") || msg.contains("403") || msg.contains("404");
+                    if (nonRetryable) {
+                        log.warnf("Non-retryable LLM error: %s", msg);
+                        throw e;
+                    }
+                    attempt++;
+                    if (attempt >= maxRetries) {
+                        log.warnf("LLM retry exhausted: %s", msg);
+                        throw e;
+                    }
+                    long backoff = backoffMs * (1L << (attempt - 1));
+                    log.infof("LLM retryable error (attempt %d/%d), backing off %dms: %s", attempt, maxRetries, backoff, msg);
+                    try { Thread.sleep(backoff); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); throw new RuntimeException(ie); }
+                }
+            }
             nTurns++;
             AiMessage aiMessage = response.aiMessage();
             messages.add(aiMessage);
