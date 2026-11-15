@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class MinimalHarness {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MinimalHarness.class);
     private final Model model;
     private final List<Map<String, Object>> messages = new ArrayList<>();
     private int nTurns = 0;
@@ -40,9 +41,10 @@ public class MinimalHarness {
     }
 
     private void checkLimits() {
-        if (nTurns >= maxTurns) throw new IllegalStateException("max_turns=" + maxTurns);
-        if (cost >= maxCost) throw new IllegalStateException("max_cost=$" + maxCost);
+        if (nTurns >= maxTurns) { log.warn("max_turns reached: {}", maxTurns); throw new IllegalStateException("max_turns=" + maxTurns); }
+        if (cost >= maxCost) { log.warn("max_cost reached: {}", maxCost); throw new IllegalStateException("max_cost=$" + maxCost); }
         if (wallClockMaxMs > 0 && (System.currentTimeMillis() - startedAt) >= wallClockMaxMs) {
+            log.warn("wall_clock_cap reached: {}ms", wallClockMaxMs);
             throw new IllegalStateException("wall_clock_cap=" + wallClockMaxMs + "ms");
         }
     }
@@ -101,6 +103,7 @@ public class MinimalHarness {
                     "tool_calls", resp.toolCalls()));
             if (resp.toolCalls().isEmpty()) return resp.content();
             for (Model.ToolCall call : resp.toolCalls()) {
+                log.debug("Tool call: {} args={}", call.name(), call.args());
                 if (isStuck(call)) {
                     messages.add(Map.of("role", "tool", "tool_call_id", call.id(),
                             "content", Tools.truncate("ERROR: stuck - repeated identical tool call")));
@@ -149,6 +152,7 @@ public class MinimalHarness {
                     "tool_calls", resp.toolCalls()));
             if (resp.toolCalls().isEmpty()) return resp.content();
             for (Model.ToolCall call : resp.toolCalls()) {
+                log.debug("Tool call: {} args={}", call.name(), call.args());
                 if (isStuck(call)) {
                     messages.add(Map.of("role", "tool", "tool_call_id", call.id(),
                             "content", Tools.truncate("ERROR: stuck - repeated identical tool call")));

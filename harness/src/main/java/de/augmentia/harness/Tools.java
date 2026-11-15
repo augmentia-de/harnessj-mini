@@ -4,6 +4,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class Tools {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Tools.class);
     private static final int TRUNCATE_LIMIT = 25_000;
 
     private Tools() {}
@@ -107,6 +108,7 @@ public final class Tools {
     }
 
     public static String dispatch(String name, Map<String, Object> args) {
+        log.debug("Dispatch tool: {} args={}", name, args);
         Map<String, Object> a = args == null ? Map.of() : args;
         return switch (name) {
             case "bash" -> {

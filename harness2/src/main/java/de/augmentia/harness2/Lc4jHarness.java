@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Lc4jHarness {
+    private static final org.jboss.logging.Logger log = org.jboss.logging.Logger.getLogger(Lc4jHarness.class);
     private final ChatModel model;
     private final List<ChatMessage> messages = new ArrayList<>();
     private int nTurns = 0;
@@ -71,6 +72,7 @@ public class Lc4jHarness {
             }
 
             for (ToolExecutionRequest req : aiMessage.toolExecutionRequests()) {
+                log.debugf("Tool call: %s args=%s", req.name(), req.arguments());
                 String out;
                 try {
                     Map<String, Object> args = new com.fasterxml.jackson.databind.ObjectMapper().readValue(req.arguments(), Map.class);
