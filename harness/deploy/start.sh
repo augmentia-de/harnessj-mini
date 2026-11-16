@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 mkdir -p "${LOG_DIR:-./logs}"
 set -a; . ./.env 2>/dev/null || true; set +a
 MODE="${1:-web}"

@@ -1,19 +1,22 @@
 services:
   harness2-native:
     image: harness2:native
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.native
     container_name: harness2-native
     working_dir: /work
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     environment:
       - QUARKUS_HTTP_PORT=18004
       - LOG_DIR=/data/log
       - HOME=/data/home
     volumes:
-      - ./log:/data/log
-      - ./data/home:/data/home
-      - ./workspace:/workspace
+      - ../log:/data/log
+      - ../data/home:/data/home
+      - ../workspace:/workspace
     working_dir: /workspace
     ports:
       - "127.0.0.1:18004:18004"

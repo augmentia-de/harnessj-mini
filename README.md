@@ -20,20 +20,20 @@ cd harness2 && mvn -Pnative package -DskipTests
 
 ```bash
 # harness
-cd harness && ./start.sh {tui|web|run} [task]
+cd harness && ./deploy/start.sh {tui|web|run} [task]
 
 # harness2
-cd harness2 && ./start.sh {web|run}
+cd harness2 && ./deploy/start.sh {web|run}
 ```
 
 ## Docker
 
 ```bash
-# harness
-cd harness && docker compose up -d --build
+# harness (Spring Boot)
+cd harness/deploy && ./deploy.sh
 
-# harness2
-cd harness2 && ./deploy-native.sh
+# harness2 (Quarkus native)
+cd harness2/deploy && ./deploy-native.sh
 ```
 
 ## Architecture & Entry Points

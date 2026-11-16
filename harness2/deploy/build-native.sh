@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 mkdir -p "${LOG_DIR:-./logs}"
 export JAVA_HOME=/tmp/opencode/mandrel/mandrel
 export PATH="${JAVA_HOME}/bin:${PATH}"

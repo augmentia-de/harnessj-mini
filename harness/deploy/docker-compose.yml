@@ -1,16 +1,18 @@
 services:
   harness:
-    build: .
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
     container_name: harness
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     environment:
       - SERVER_PORT=18000
       - LOG_DIR=/data/log
     volumes:
-      - ./logs:/data/log
-      - ./workspace:/workspace
+      - ../logs:/data/log
+      - ../workspace:/workspace
     working_dir: /workspace
     ports:
       - "127.0.0.1:18000:18000"
