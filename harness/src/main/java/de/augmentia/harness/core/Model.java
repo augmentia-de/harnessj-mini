@@ -1,4 +1,4 @@
-package de.augmentia.harness;
+package de.augmentia.harness.core;
 
 import java.util.List;
 import java.util.Map;

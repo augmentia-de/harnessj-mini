@@ -1,4 +1,10 @@
-package de.augmentia.harness;
+package de.augmentia.harness.core;
+
+import de.augmentia.harness.PermissionGate;
+import de.augmentia.harness.SubAgent;
+import de.augmentia.harness.tools.Tools;
+import de.augmentia.harness.exceptions.RetryableException;
+import de.augmentia.harness.exceptions.NonRetryableException;
 
 import java.nio.file.Path;
 import java.util.*;

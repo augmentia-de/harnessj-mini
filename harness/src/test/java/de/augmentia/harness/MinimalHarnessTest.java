@@ -1,4 +1,9 @@
-package de.augmentia.scaffold;
+package de.augmentia.harness;
+
+import de.augmentia.harness.core.MinimalHarness;
+import de.augmentia.harness.core.Model;
+import de.augmentia.harness.core.ContextDiscovery;
+import de.augmentia.harness.tools.Tools;
 
 import de.augmentia.harness.*;
 import org.junit.jupiter.api.Test;

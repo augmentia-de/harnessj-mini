@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.augmentia.harness.Model;
-import de.augmentia.harness.RetryableException;
-import de.augmentia.harness.NonRetryableException;
+import de.augmentia.harness.core.Model;
+import de.augmentia.harness.exceptions.RetryableException;
+import de.augmentia.harness.exceptions.NonRetryableException;
 
 import java.net.URI;
 import java.net.http.HttpClient;

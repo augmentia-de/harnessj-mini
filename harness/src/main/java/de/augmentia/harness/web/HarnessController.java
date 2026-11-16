@@ -1,6 +1,6 @@
 package de.augmentia.harness.web;
 
-import de.augmentia.harness.MinimalHarness;
+import de.augmentia.harness.core.MinimalHarness;
 import de.augmentia.harness.config.HarnessProperties;
 import de.augmentia.harness.model.OpenAiModel;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package de.augmentia.scaffold;
+package de.augmentia.harness;
 
 import de.augmentia.harness.DeferredToolLoader;
 import org.junit.jupiter.api.Test;

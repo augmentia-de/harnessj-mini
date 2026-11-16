@@ -1,4 +1,4 @@
-package de.augmentia.harness;
+package de.augmentia.harness.exceptions;
 
 public class NonRetryableException extends RuntimeException {
     public NonRetryableException(String message) { super(message); }

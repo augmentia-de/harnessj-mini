@@ -1,4 +1,4 @@
-package de.augmentia.harness;
+package de.augmentia.harness.core;
 
 import java.nio.file.*;
 import java.util.*;

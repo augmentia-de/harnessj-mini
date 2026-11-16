@@ -1,6 +1,8 @@
-package de.augmentia.scaffold;
+package de.augmentia.harness;
 
-import de.augmentia.harness.FuzzyEdit;
+import de.augmentia.harness.tools.FuzzyEdit;
+
+import de.augmentia.harness.tools.FuzzyEdit;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 

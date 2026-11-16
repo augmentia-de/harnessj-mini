@@ -2,7 +2,7 @@ package de.augmentia.harness;
 
 import de.augmentia.harness.config.HarnessProperties;
 import de.augmentia.harness.model.OpenAiModel;
-import de.augmentia.harness.MinimalHarness;
+import de.augmentia.harness.core.MinimalHarness;
 import de.augmentia.harness.PermissionGate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

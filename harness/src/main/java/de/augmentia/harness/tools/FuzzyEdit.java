@@ -1,4 +1,4 @@
-package de.augmentia.harness;
+package de.augmentia.harness.tools;
 
 import java.util.*;
 
