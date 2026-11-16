@@ -1,6 +1,5 @@
 # harnessj-mini
-
-**harnessj-mini** is a minimal, testable Java reference for agent harness loops. It implements the core agent-loop pattern — `while(true)` until no tool calls, with limits, compaction, stuck detection, permission gate, error as observation — in two variants: a Spring Boot edition (Lanterna TUI + Web UI) and a Quarkus + LangChain4j edition (native build). No agentic framework, no RAG, no vector store. Built to understand what an agent harness actually is before scaling to production.
+​harnessj-mini is a minimal, testable Java reference for agent harness loops. It implements the core agent-loop pattern — while(true) until no tool calls, with limits, compaction, stuck detection, permission gate, error as observation — in two variants: a Spring Boot edition (Lanterna TUI + Web UI) and a Quarkus + LangChain4j edition (native build). No agentic framework, no RAG, no vector store. Built to look under the hood, understand agent behavior, and grasp what an agent harness actually is before scaling to production..
 
 Minimal agent harness in Java — two implementations:
 
