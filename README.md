@@ -36,6 +36,55 @@ cd harness && docker compose up -d --build
 cd harness2 && ./deploy-native.sh
 ```
 
+## Architecture & Entry Points
+
+### Where to start reading
+
+1. **`Model.java`** (`core/`) — the provider interface. Defines `complete(messages, tools)` and the `Response`/`ToolCall` records. 30 lines.
+2. **`Tools.java`** (`tools/`) — the 4 tools (bash, read_file, write_file, search_replace) + `dispatch()` + `truncate()`. The tool surface.
+3. **`ContextDiscovery.java`** (`core/`) — walks from cwd to root, collects AGENTS.md / CLAUDE.md / .cursorrules / etc.
+4. **`MinimalHarness.java`** (`core/`) — the agent loop. Read `run()` and `chat()` first, then `checkLimits()`, `maybeCompact()`, `completeWithRetry()`.
+5. **`HarnessApplication.java`** — Spring Boot entry point. Wires config → model → harness → CLI/TUI/Web.
+6. **`HarnessController.java`** (`web/`) — REST/SSE endpoint. Shows how the loop is invoked from the web.
+
+### Execution flow (one turn)
+
+```
+Task → MinimalHarness.run()
+  → ContextDiscovery.discover(cwd)
+  → messages = [system + context, user task]
+  → while (true):
+      → checkLimits()          // maxTurns, maxCost, wall-clock
+      → maybeCompact()         // threshold compaction (50% / 30% tail)
+      → model.complete()       // LLM call (with retry on 429/5xx)
+      → append assistant response
+      → if no tool calls → return
+      → for each tool call:
+          → isStuck?           // 3 identical calls → hard stop
+          → permissionGate.allow?  // PLAN/DEFAULT/YOLO
+          → Tools.dispatch()   // execute + truncate
+          → append tool result (error-as-observation)
+      → if consecutiveMalformed >= 5 → throw
+```
+
+### Key invariants
+
+- Messages are never silently dropped — compaction preserves system + recent tail.
+- Tool errors become observations, not exceptions — the LLM can react.
+- Limits are checked before every turn — no runaway loops.
+- Stuck detection prevents infinite tool-call cycles.
+
+### Optional extensions
+
+| Module | Purpose |
+|---|---|
+| `tools/FuzzyEdit.java` | Fuzzy cascade for edit tools (Levenshtein @ 0.65) |
+| `tools/DeferredToolLoader.java` | Deferred loading for >15 tools |
+| `tools/SandboxedProcessRunner.java` | OS-level sandboxing (bwrap) |
+| `McpClient.java` | MCP client with trust tiers |
+| `MemoryStore.java` | Persistent memory interface |
+| `SubAgent.java` | Multi-agent delegation |
+
 ## Configuration
 
 See `.env.example` in each subproject.
