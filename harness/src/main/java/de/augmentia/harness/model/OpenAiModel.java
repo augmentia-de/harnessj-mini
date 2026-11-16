@@ -17,6 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * OpenAI-compatible model provider using java.net.http.HttpClient.
+ *
+ * <h2>Flow</h2>
+ * <ol>
+ *   <li>Build JSON request body (model, messages, tools with parameter schemas).</li>
+ *   <li>Send HTTP POST to /chat/completions with Authorization + optional session header.</li>
+ *   <li>Parse response: extract content + tool_calls.</li>
+ *   <li>On HTTP 4xx (except 429): throw NonRetryableException (stop).</li>
+ *   <li>On 429/5xx/IOException: throw RetryableException (retry with backoff).</li>
+ * </ol>
+ *
+ * <h2>Tool schemas</h2>
+ * Tool parameter schemas are passed through from Tools.schemas() so the LLM
+ * knows which arguments to provide.
+ */
 public class OpenAiModel implements Model {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

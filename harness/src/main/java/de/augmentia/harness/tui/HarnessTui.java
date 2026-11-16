@@ -13,6 +13,22 @@ import de.augmentia.harness.model.OpenAiModel;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Lanterna-based TUI for the harness.
+ *
+ * <h2>Layout</h2>
+ * <ul>
+ *   <li>logBox (read-only TextBox) — chat history + results.</li>
+ *   <li>inputBox (TextBox) — task input.</li>
+ *   <li>Run button — triggers harness.chat() in a background thread.</li>
+ * </ul>
+ *
+ * <h2>Flow</h2>
+ * 1. User types task in inputBox.
+ * 2. Run button calls getHarness().chat(task) in a background thread.
+ * 3. Result is appended to logBox via GUI thread (invokeLater).
+ * 4. Conversation history is preserved across turns (persistent harness instance).
+ */
 public class HarnessTui {
     private final HarnessProperties props;
     private MinimalHarness harness;

@@ -6,6 +6,21 @@ import java.util.*;
  * Edit-Tool Contract (Recommendation 5): fuzzy cascade for weaker models.
  * Tries exact match first, then whitespace-normalized, then line-level Levenshtein.
  */
+/**
+ * Fuzzy edit utility (Recommendation 5: Edit-Tool Contract).
+ *
+ * <h2>Cascade</h2>
+ * <ol>
+ *   <li>Exact match — if the search string occurs exactly once, replace it.</li>
+ *   <li>Whitespace-normalized — collapse whitespace and retry.</li>
+ *   <li>Line-level fuzzy — find the best matching block via Levenshtein
+ *       similarity (threshold 0.65) and replace it.</li>
+ * </ol>
+ *
+ * <h2>Usage</h2>
+ * Called by {@link Tools#searchReplace} when fuzzy=true and exact match fails.
+ * Returns null if no match is found.
+ */
 public final class FuzzyEdit {
     private FuzzyEdit() {}
 

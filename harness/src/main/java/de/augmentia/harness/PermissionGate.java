@@ -2,6 +2,20 @@ package de.augmentia.harness;
 
 import java.util.Map;
 
+/**
+ * Permission gate for tool execution (Recommendation 9: Three-Mode Approval).
+ *
+ * <h2>Modes</h2>
+ * <ul>
+ *   <li><b>PLAN:</b> Read-only — only read_file is allowed.</li>
+ *   <li><b>DEFAULT:</b> Reads + safe bash (ls, cat, echo, pwd) allowed; destructive bash denied.</li>
+ *   <li><b>YOLO:</b> All tools allowed (no restrictions).</li>
+ * </ul>
+ *
+ * <h2>Policy as code</h2>
+ * {@link #fromPolicyFile(java.nio.file.Path)} loads allow/deny rules from a
+ * properties file (Recommendation 11).
+ */
 public interface PermissionGate {
     enum Mode { PLAN, DEFAULT, YOLO }
 

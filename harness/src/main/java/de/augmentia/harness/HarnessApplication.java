@@ -10,6 +10,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+/**
+ * Spring Boot entry point for the harness.
+ *
+ * <h2>Startup flow</h2>
+ * <ol>
+ *   <li>Load configuration from application.properties + .env.</li>
+ *   <li>Run CommandLineRunner: if --tui flag, launch Lanterna TUI; otherwise run CLI task.</li>
+ *   <li>Web UI available at / (static index.html) and /api/run (SSE).</li>
+ * </ol>
+ */
 @SpringBootApplication
 @EnableConfigurationProperties(HarnessProperties.class)
 public class HarnessApplication {

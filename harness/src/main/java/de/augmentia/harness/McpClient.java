@@ -3,6 +3,20 @@ package de.augmentia.harness;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * MCP client interface with trust tiers (Recommendation 14).
+ *
+ * <h2>Trust tiers</h2>
+ * <ul>
+ *   <li><b>TRUSTED:</b> auto-load tools.</li>
+ *   <li><b>SCANNED:</b> load after scanning for dangerous patterns.</li>
+ *   <li><b>QUARANTINED:</b> blocked from execution.</li>
+ * </ul>
+ *
+ * <h2>Scanning</h2>
+ * {@link #scan()} checks tool names against a list of dangerous patterns
+ * (bash, rm, delete, exec, shell, eval).
+ */
 public interface McpClient {
     enum TrustTier { TRUSTED, SCANNED, QUARANTINED }
 

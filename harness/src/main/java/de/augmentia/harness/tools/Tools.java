@@ -3,6 +3,19 @@ package de.augmentia.harness.tools;
 import java.nio.file.*;
 import java.util.*;
 
+/**
+ * Four-tool surface: bash, read_file, write_file, search_replace.
+ * All outputs are truncated to TRUNCATE_LIMIT characters.
+ *
+ * <h2>Dispatch flow</h2>
+ * {@link #dispatch(String, Map)} routes a tool call by name to the
+ * corresponding method. Arguments are extracted from the map; missing
+ * values default to safe values (0, empty string).
+ *
+ * <h2>Truncation</h2>
+ * {@link #truncate(String)} caps output at 25 000 chars to prevent
+ * context-window overflow from large command outputs.
+ */
 public final class Tools {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Tools.class);
     private static final int TRUNCATE_LIMIT = 25_000;

@@ -9,6 +9,50 @@ import de.augmentia.harness.exceptions.NonRetryableException;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * Minimum viable agent harness (~90 lines concept, extended with retry/streaming).
+ *
+ * <h2>Purpose</h2>
+ * Runs an LLM-driven agent loop: sends a task to the model, executes tool calls,
+ * feeds results back, and repeats until the model stops calling tools.
+ *
+ * <h2>Execution flow (chat / run)</h2>
+ * <ol>
+ *   <li><b>Setup:</b> Clear messages (run) or keep them (chat). Add system prompt
+ *       with auto-discovered context (AGENTS.md, CLAUDE.md, ...).</li>
+ *   <li><b>Loop:</b> {@code while (true)}:
+ *     <ul>
+ *       <li>{@link #checkLimits()} — abort if maxTurns, maxCost, or wall-clock exceeded.</li>
+ *       <li>{@link #maybeCompact()} — if token estimate exceeds threshold, summarize
+ *           and keep system + last 30 %.</li>
+ *       <li>{@code model.complete()} — call LLM with current messages + tool schemas.
+ *           Retried on transient errors (429, 5xx) with exponential backoff.</li>
+ *       <li>Append assistant response (content + tool_calls) to messages.</li>
+ *       <li>If no tool calls → return content (done).</li>
+ *       <li>For each tool call:
+ *         <ul>
+ *           <li>Stuck check (3 identical calls → hard stop).</li>
+ *           <li>Permission gate (PLAN/DEFAULT/YOLO).</li>
+ *           <li>Dispatch tool → truncate output → append as tool result.</li>
+ *           <li>Errors are caught and returned as "ERROR: ..." (error-as-observation).</li>
+ *         </ul>
+ *       </li>
+ *     </ul>
+ *   </li>
+ * </ol>
+ *
+ * <h2>Key invariants</h2>
+ * <ul>
+ *   <li>Messages are never silently dropped — compaction preserves system + recent tail.</li>
+ *   <li>Tool errors become observations, not exceptions — the LLM can react to them.</li>
+ *   <li>Limits are checked before every turn — no runaway loops.</li>
+ *   <li>Stuck detection prevents infinite tool-call cycles.</li>
+ * </ul>
+ *
+ * @see Model
+ * @see Tools
+ * @see ContextDiscovery
+ */
 public class MinimalHarness {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MinimalHarness.class);
     private final Model model;

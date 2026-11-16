@@ -12,6 +12,23 @@ import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * REST controller for the harness web UI.
+ *
+ * <h2>Endpoints</h2>
+ * <ul>
+ *   <li>GET /api/run?task=... — SSE stream with start/turn/result/error events.</li>
+ *   <li>GET / — static index.html (Web UI).</li>
+ * </ul>
+ *
+ * <h2>Flow</h2>
+ * 1. Create SseEmitter (unlimited timeout).
+ * 2. Submit task to executor thread.
+ * 3. Send "start" event.
+ * 4. Run harness.chat() with turn callback → sends "turn" events.
+ * 5. Send "result" event with final answer.
+ * 6. Complete emitter.
+ */
 @RestController
 @RequestMapping("/api")
 public class HarnessController {

@@ -7,6 +7,14 @@ import java.util.stream.Collectors;
  * Deferred Tool Loading (Recommendation 4): when tool count exceeds threshold,
  * expose only a search tool + load individual tools on demand.
  */
+/**
+ * Deferred tool loading (Recommendation 4).
+ *
+ * <h2>Purpose</h2>
+ * When tool count exceeds a threshold (~15), only expose a search tool and
+ * a load tool. Individual tools are loaded on demand via {@link #load(String)}.
+ * This reduces the initial prompt size by ~40%.
+ */
 public final class DeferredToolLoader {
     private final List<Map<String, Object>> allTools;
     private final Set<String> loaded = new HashSet<>();

@@ -7,6 +7,20 @@ import java.util.*;
  * OS-Level Sandboxing (Recommendation 10): wraps bash execution in bwrap if available.
  * Falls back to direct execution when bwrap is not installed.
  */
+/**
+ * OS-level sandboxing (Recommendation 10) for bash execution.
+ *
+ * <h2>Flow</h2>
+ * <ol>
+ *   <li>Check if {@code bwrap} (bubblewrap) is available.</li>
+ *   <li>If available: wrap command in bwrap (read-only root, unshared namespaces).</li>
+ *   <li>If not: fall back to direct bash execution.</li>
+ * </ol>
+ *
+ * <h2>Usage</h2>
+ * Replaces {@link Tools#bash(String)} when sandboxing is desired.
+ * Check {@link #isSandboxed()} to see if bwrap is active.
+ */
 public final class SandboxedProcessRunner {
     private final boolean useSandbox;
 
